@@ -1,0 +1,36 @@
+#include <pthread.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
+ 
+void *func(void *name)
+{
+    pthread_t id;
+    // 현재 쓰레드의 id 를 얻어서 출력합니다
+    id = pthread_self();  
+    printf("Thread %s id : %ud\n", (char*)name, (int)id);
+}
+ 
+int main(int argc, char **argv)
+{
+    pthread_t p_thread;
+    int result;
+ 
+    // 메인쓰레드도 쓰레드 id 출력
+    func("Main");
+ 
+    // 첫번째 쓰레드 생성및 id 출력
+    pthread_create(&p_thread, NULL, func, "THREAD1");
+    printf("THREAD1 Created : %ud\n", (int)p_thread);
+    pthread_join(p_thread, (void *)&result);
+ 
+    // 두번째 쓰레드 생성및 id 출력
+    pthread_create(&p_thread, NULL, func, "THREAD2");
+    printf("THREAD2 Created : %ud\n", (int)p_thread);
+    pthread_join(p_thread, (void *)&result);
+ 
+    return 1;
+}
+
+
+출처: https://bitsoul.tistory.com/167 [Happy Programmer~]
