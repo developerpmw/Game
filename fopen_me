@@ -1,0 +1,62 @@
+#include <pthread.h> //include pthread func
+#include <stdio.h> //include basic func
+#include <stdlib.h> //include malloc func
+#include <sys/time.h> //include gettimeofday func
+
+#define bl 62 //define the number of chars in a line
+#define str "aaccggtt" //define the given string
+pthread_mutex_t m_lock; //declare a lock variable
+
+void *func(void *val) //func for thread
+{
+	FILE *fp=(FILE*)val; //get the file pointer
+	char buffer[bl]; //declare a buffer for fgets func
+	int i,j; //declare int for for statement
+	while(1) //infinite loop
+	{
+		pthread_mutex_lock(&m_lock); //start to lock
+		if(fgets(buffer,bl,fp)==NULL) break; //get a line or break loop
+		pthread_mutex_unlock(&m_lock); //unlock
+		for(i=0;i<53;i++) //repeat within one line
+		{
+			for(j=0;j<8;j++) //check 8chars
+			{
+				if(str[j]!=buffer[i+j]) //check chars are different
+					goto CON; //continue outer for statement			
+			}
+			printf("%s",buffer); //print the line if all chars are the same
+			break; //break to get a next line
+			CON:; //continue flag
+		}
+	}
+	pthread_mutex_unlock(&m_lock); //unlock after break the loop
+}
+
+int main() //main func
+{
+	struct timeval start, end; //declare timeval
+	pthread_t *tid; //declare a pointer of threadids array
+	char filename[20]; //declate a char array for filename
+	int i, tnum; //declare int for for statement and number of threads 
+	FILE *fp; //declare file pointer
+	
+	scanf("%d %s",&tnum, filename); //scan what is required
+	
+	gettimeofday(&start, NULL); //record job start time
+	
+	fp = fopen(filename, "r"); //get file pointer
+	tid=malloc(tnum*sizeof(pthread_t)); //allocate memory for threadiss array
+	for(i=0;i<tnum;i++) //repeat for the number of threadids
+	{
+		pthread_create(&tid[i], NULL, func, (void*)fp); //create threads
+	}
+	for(i=0;i<tnum;i++) //repeat fot the number of threadids
+	{
+		pthread_join(tid[i], NULL); //wait for the threads to finish
+	}
+	fclose(fp); //close file pointer
+
+	gettimeofday(&end, NULL); //record job end time
+	printf("Excution time: %0.6fs\n", (end.tv_sec-start.tv_sec)+(end.tv_usec-start.tv_usec)/1000000.0); //print excution time using the recorded times
+	return 0; //return
+}
