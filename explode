@@ -1,0 +1,37 @@
+<?php
+
+$conn = mysqli_connect("localhost", "root", "password", "test");
+
+$fp = fopen("tracedBlock.txt", "r") or die("파일을 열 수 없습니다!");
+
+while( !feof($fp) ) {
+    #echo fgets($fp) ."<br>\n";
+    $txt = fgets($fp);
+    if(strpos($txt, "sed") !== false)
+    {
+        while(strpos($txt,"  "))
+        {
+            $txt = str_replace('  ', ' ', $txt);
+        }
+        echo $txt."<br>\n";
+        $process = substr($txt,0,4);
+        $slice = explode(' ',$txt);
+        $block =$slice[4];
+        $byte = $slice[5];
+        echo $process ." ". $block ." ". $byte ."<br>\n";
+        mysqli_query($conn, " INSERT INTO ex1 ( process, blockNumber, byte ) VALUES ( '{$tmpnum}', '{$block}', '{$byte}' )");
+    }
+}
+
+fclose($fp);
+
+
+#$tmpnum=$_GET['a'];
+#$block=$_GET['b'];
+#$byte=$_GET['c'];
+#echo $tmpnum . " " . $block . " " . $byte;
+
+
+#mysqli_query($conn, " INSERT INTO ex1 ( process, blockNumber, byte ) VALUES ( '{$tmpnum}', '{$block}', '{$byte}' )");
+mysqli_close($conn)
+?>
