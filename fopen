@@ -1,0 +1,70 @@
+#include <pthread.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <sys/time.h>
+#include <unistd.h>
+
+char *fn;
+int num;
+int count[255];
+void *t_func(void *data)
+{
+	FILE *fp;
+	int i = *(int *)data;
+	int j;
+	int k = 35549/num;
+	//pthread_t thread_id = pthread_self();
+	printf("thread %d\n", i);
+
+	if((fp = fopen(fn,"r")) == NULL){
+		perror("fopen : ssuis_ref.fna");
+		exit(1);
+	}
+			
+	//printf("%d\n", i);
+	fseek(fp, 61*i*k, SEEK_SET);
+
+	char strTemp[255];
+	char *pStr;
+	for (j=0; j<k; j++)
+	{
+		//printf("%d\n", sizeof (strTemp));
+		pStr = fgets(strTemp, 255, fp);
+		if(pStr!=NULL && strstr(strTemp, "aaccggtt"))
+			printf("%s",strTemp);
+	}
+	fclose(fp);
+
+	return NULL;
+
+}
+
+int main(int argc, char *argv[]){
+	num = atoi(argv[1]);
+	pthread_t thread_id[num];
+	int i;
+	struct timeval t1, t2;
+	gettimeofday(&t1, NULL);
+	if(argc < 3)
+	{
+		perror("you must enter two parameters.\n");
+		exit(1);
+	}
+	fn=argv[2];
+	
+	for(i=0;i<num;i++)
+	{
+		count[i]=i;
+		pthread_create(&thread_id[i], NULL, t_func, (void *)&count[i]);
+	}
+	for(i=0;i<num;i++)
+	{
+		pthread_join(thread_id[i], NULL);
+	}
+
+	gettimeofday(&t2, NULL);
+	printf("%f\n",(t2.tv_sec + t2.tv_usec*0.000001)-(t1.tv_sec + t1.tv_usec*0.000001));
+
+	return 0;
+}
