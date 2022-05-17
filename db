@@ -1,0 +1,29 @@
+include_once "lib.php";
+
+
+$_GET['xx']	//  http://~~~~.php?xx=~~&~~~~
+
+"insert into table_name set field1='$var1' "
+
+$conn = mysqli_connect("localhost", “user이름", ＂password", “database이름");
+
+mysqli_query($conn, "~~");
+"insert into table_name set field1='$var1', field1='$var1'  "
+" INSERT INTO table_name ( field1, field2) VALUES ( ‘{$var1}', ‘{$var2}’ )”
+
+function get($q, &$rs, &$rn) {
+$rs=NULL;
+$rn=0;
+$rs1 = mysqli_query($conn, $q) or die (mysqli_error($conn));
+$rn = mysqli_num_rows($rs1);
+while ($row=mysqli_fetch_array($rs1))
+	$rs[] = $row;
+}
+
+get("select field1, field2 from table_name ", $rs, $rn); //order by seq desc limit 1
+
+for ($i=0; $i<$rn; $i++) {
+	echo $rs[$i]['field1'] ." ". $rs[$i]['field2'] ."<br>\n";
+}
+
+mysqli_close($conn)
